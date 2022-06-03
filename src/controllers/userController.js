@@ -23,7 +23,7 @@ let hendleLogin = async(req, res) => {
 
 let hendleGetAllUsers = async (req, res) => {
     let id = req.query.id // all or id
-
+   
     if (!id) {
        return res.status(500).json({
         errCode: 1 ,
