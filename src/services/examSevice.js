@@ -81,7 +81,7 @@ let updateExamData = (data) => {
                 })
             }
         } catch (e) {
-            reject(ejs)
+            reject(e)
         }
     })
 }

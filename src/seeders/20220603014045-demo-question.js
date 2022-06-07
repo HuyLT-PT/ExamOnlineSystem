@@ -3,8 +3,8 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
      return queryInterface.bulkInsert('Questions', [{ 
-      examId:'1',
-      content : '1+1',
+      examId:'10',
+      content : '1+1+1+1',
       optionA: '1',
       optionB: '2',
       optionC: '3',
@@ -14,7 +14,7 @@ module.exports = {
       updatedAt: new Date()
     }]);
   },
-
+  // npx sequelize-cli db:seed --seed my-seeder-file.js 
   async down (queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.

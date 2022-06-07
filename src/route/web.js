@@ -3,6 +3,7 @@ import { handle } from "express/lib/application";
 import homeController from "../controllers/homecontroller";
 import userController from "../controllers/userController"
 import examController from "../controllers/examController"
+import questionController from "../controllers/questionController"
 
 let router = express.Router();
 
@@ -29,6 +30,11 @@ let initWebRoutes = (app) => {
     router.delete('/api/delete-exam', examController.handleDeleteExam);
     router.post('/api/create-new-exam', examController.handleCreateNewExam);
     
+
+    router.get('/api/get-question', questionController.handleGetQuestions)
+    router.put('/api/edit-question', questionController.handleEditQuestion);
+   //router.delete('/api/delete-exam', examController.handleDeleteExam);
+    router.post('/api/create-new-question', questionController.handleCreateNewQuestion)
     //get data start page
     router.get('/',(req,res)=>{
         return res.send(" Start")
