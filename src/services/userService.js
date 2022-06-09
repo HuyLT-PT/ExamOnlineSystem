@@ -47,8 +47,6 @@ let handleUserLogin = (email, password) => {
         }
     })
 }
-
-
 let checkUserEmail = (userEmail) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -65,7 +63,6 @@ let checkUserEmail = (userEmail) => {
         }
     })
 }
-
 let getAllUsers = (userId) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -136,7 +133,6 @@ let createNewUser = (data) => {
         }
     })
 }
-
 let deleteUser = (id) => {
     return new Promise(async (resolve, reject) => {
         let user = await db.User.findOne({
@@ -160,7 +156,6 @@ let deleteUser = (id) => {
         })
     })
 }
-
 let updateUserData = (data) => {
     return new Promise(async(resolve, reject) => {
 
@@ -205,10 +200,42 @@ let updateUserData = (data) => {
         }
     })
 }
+let getAllStudents = (userId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let users = ''
+            if (userId === 'ALL') {
+                users = await db.User.findAll({
+                    where: {
+                        roleId: 1,
+                        class : null
+                    }
+                    
+                })
+            }
+            
+            if (userId && userId !== 'ALL') {
+                users = db.User.findOne({
+                    where: {
+                        id: userId,
+                        roleId:1
+                    }
+                    
+                }) 
+            }
+
+            resolve(users)
+           
+        }catch (e) {
+            reject(e)
+        }
+    })
+}
 module.exports = {
     handleUserLogin: handleUserLogin,
     getAllUsers: getAllUsers,
     createNewUser: createNewUser,
     deleteUser:deleteUser,
-    updateUserData:updateUserData
+    updateUserData: updateUserData,
+    getAllStudents: getAllStudents
 }

@@ -1,4 +1,4 @@
-import examSevice from "../services/examSevice"
+import examService from "../services/examService"
 
 let handleGetExams =async(req,res) => {
     let id = req.query.id 
@@ -12,7 +12,7 @@ let handleGetExams =async(req,res) => {
     }) 
     }   
     
-    let exams = await examSevice.getAllExams(id)
+    let exams = await examService.getAllExams(id)
 
         return res.status(200).json({
         errCode: 0 ,
@@ -28,16 +28,16 @@ let handleDeleteExam = async(req, res) => {
             errMessage: 'missing require'
         })
     }
-    let message = await examSevice.deleteExam(req.body.id)
+    let message = await examService.deleteExam(req.body.id)
     return res.status(200).json(message)
 }
 let handleEditExam = async(req,res) => {
     let data =req.body 
-    let message =await examSevice.updateExamData(data)
+    let message =await examService.updateExamData(data)
     return res.status(200).json(message)
 }
 let handleCreateNewExam  = async (req, res) => {
-    let message = await examSevice.createNewExam(req.body)
+    let message = await examService.createNewExam(req.body)
     return res.status(200).json(message)
 }
 module.exports = {

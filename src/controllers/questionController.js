@@ -1,4 +1,4 @@
-import questionSevice from '../services/questionSevice'
+import questionService from '../services/questionService'
 
 let handleGetQuestions = async (req, res) => {
     
@@ -13,7 +13,7 @@ let handleGetQuestions = async (req, res) => {
     }) 
     }   
     
-    let questionsList = await questionSevice.getAllQuestionFromExam(id)
+    let questionsList = await questionService.getAllQuestionFromExam(id)
         
         return res.status(200).json({
         errCode: 0 ,
@@ -22,12 +22,12 @@ let handleGetQuestions = async (req, res) => {
     })
 }
 let handleCreateNewQuestion  = async (req, res) => {
-    let message = await examSevice.createNewQuestion(req.body)
+    let message = await examService.createNewQuestion(req.body)
     return res.status(200).json(message)
 }
 let handleEditQuestion = async(req, res) => {
     let data = req.body
-    let message = await questionSevice.updateQuestionData(data)
+    let message = await questionService.updateQuestionData(data)
     return res.status(200).json(message)
  }  
 module.exports = {

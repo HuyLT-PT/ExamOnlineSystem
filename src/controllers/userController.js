@@ -1,4 +1,4 @@
-import userService from "../services/userSevice"
+import userService from "../services/userService"
 
 let hendleLogin = async(req, res) => {
     let email = req.body.email;
@@ -61,10 +61,29 @@ let handleEditUser = async(req,res) => {
     let message =await userService.updateUserData(data)
     return res.status(200).json(message)
 }
+let handleGetAllStudent = async(req, res) => {
+    let id = req.query.id // all or id
+   
+    if (!id) {
+       return res.status(500).json({
+        errCode: 1 ,
+        errMessage: 'Missing id',
+        users : []
+    }) 
+    }
+    let users = await userService.getAllStudents(id)
+
+    return res.status(200).json({
+        errCode: 0 ,
+        errMessage: 'OK',
+        users
+    })
+ }
 module.exports= {
     hendleLogin: hendleLogin,
     hendleGetAllUsers: hendleGetAllUsers,
     handleCreateNewUser: handleCreateNewUser,
     handleEditUser: handleEditUser,
-    handleDeleteUser:handleDeleteUser
+    handleDeleteUser: handleDeleteUser,
+    handleGetAllStudent : handleGetAllStudent
 }
