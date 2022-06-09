@@ -12,15 +12,16 @@ module.exports = {
       address: DataTypes.STRING,
       gender: DataTypes.BOOLEAN,
       roleid: DataTypes.STRING */ 
-      email:'admin@gmail.com',
+      email:'student2@gmail.com',
       password : '123456',
-      firstName: 'CaMap',
-      lastName: ' SauRang',
+      firstName: 'MONKEY D',
+      lastName: 'DARAGON',
+      class : '12A2',
       dateOfBirth: '05-10-99',
       phoneNumber :'0988348216',
-      address: 'VN',
-      gender: 1,
-      roleid: 'AD',
+      address: 'HN-VN',
+      gender: 0,
+      roleid: '2',
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

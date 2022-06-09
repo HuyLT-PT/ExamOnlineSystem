@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     subject: DataTypes.STRING,
     time: DataTypes.INTEGER,
     numberOfQuestion: DataTypes.INTEGER,
-    impClass: DataTypes.STRING
+    impClass: DataTypes.STRING,
+     status: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Exam',
