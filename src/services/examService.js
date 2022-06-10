@@ -3,21 +3,31 @@ import bcrypt from 'bcryptjs'
 import { reject } from "bcrypt/promises"
 const salt = bcrypt.genSaltSync(10);
 
-let getAllExams = (examId) => {
+let getAllExams = (classId) => {
     return new Promise(async(resolve, reject) => {
         try {
             let exams = ''
-            if (examId === 'ALL') {
+            let classes = ''
+            let className =''
+            if (classId === 'ALL') {
                 exams = await db.Exam.findAll({
                     
                 })
             }
             
-            if (examId && examId !== 'ALL') {
-                exams = db.Exam.findOne({
-                    where: { id: examId } ,
-                    
-                }) 
+            
+            if (classId && classId !== 'ALL') {
+                classes = await db.ClassIn4.findOne({
+                    where: {
+                        id : classId 
+                    }
+                })
+                className = classes.name 
+                exams = db.Exam.findAll({
+                    where: {
+                       impClass: className
+                    }
+                })
             }
 
             resolve(exams)

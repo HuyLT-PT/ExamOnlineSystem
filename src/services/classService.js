@@ -7,9 +7,11 @@ let getAllClasses = (id) => {
     return new Promise(async(resolve, reject) => {
         try {
             let classes = ''
+            let teacher = ''
             if (id === 'ALL') {
-                classes = await db.ClassIn4.findAll({
-                    
+                
+            classes = await db.ClassIn4.findAll({
+                   
                 })
             }
             
@@ -27,6 +29,8 @@ let getAllClasses = (id) => {
         }
     })
 }
+
 module.exports = {
     getAllClasses: getAllClasses,
+
 }

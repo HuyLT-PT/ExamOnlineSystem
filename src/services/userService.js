@@ -47,6 +47,7 @@ let handleUserLogin = (email, password) => {
         }
     })
 }
+
 let checkUserEmail = (userEmail) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -63,6 +64,7 @@ let checkUserEmail = (userEmail) => {
         }
     })
 }
+
 let getAllUsers = (userId) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -86,6 +88,7 @@ let getAllUsers = (userId) => {
         }
     })
 }
+
 let hashPassword =(password)=>{
         return new Promise(async(resolve,reject) => {
 
@@ -99,6 +102,7 @@ let hashPassword =(password)=>{
     
         })
 }
+
 let createNewUser = (data) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -133,6 +137,7 @@ let createNewUser = (data) => {
         }
     })
 }
+
 let deleteUser = (id) => {
     return new Promise(async (resolve, reject) => {
         let user = await db.User.findOne({
@@ -156,6 +161,7 @@ let deleteUser = (id) => {
         })
     })
 }
+
 let updateUserData = (data) => {
     return new Promise(async(resolve, reject) => {
 
@@ -200,24 +206,31 @@ let updateUserData = (data) => {
         }
     })
 }
-let getAllStudents = (userId) => {
+
+let getAllStudents = (classId) => {
     return new Promise(async(resolve, reject) => {
         try {
             let users = ''
-            if (userId === 'ALL') {
+            if (classId === 'ALL') {
                 users = await db.User.findAll({
                     where: {
                         roleId: 1,
-                        class : null
                     }
                     
                 })
             }
             
-            if (userId && userId !== 'ALL') {
-                users = db.User.findOne({
+            if (classId && classId !== 'ALL') {
+                let classes = ''
+                classes = await db.ClassIn4.findOne({
                     where: {
-                        id: userId,
+                        id : classId 
+                    }
+                })
+                let className = classes.name
+                users = db.User.findAll({
+                    where: {
+                        class: className,
                         roleId:1
                     }
                     
@@ -231,11 +244,67 @@ let getAllStudents = (userId) => {
         }
     })
 }
+let updateStudentClass = (data) => {
+    return new Promise(async(resolve, reject) => {
+
+        try {
+            if (!data.id) {
+                resolve({
+                    errCode: 2,
+                    errMessage :' missing id'
+                })
+            }
+            let user= await db.User.findOne({
+                 where: { id: data.id } ,
+                 raw : false
+            })
+            if (user) {
+                user.class = data.class
+                await user.save()
+                resolve({
+                    errCode: 0,
+                    message: 'updated'
+                })
+            } else {
+                resolve({
+                    errCode: 1,
+                    errMessage : 'user not found'
+                })
+            }
+        } catch (e) {
+            reject(ejs)
+        }
+    })
+}
+let getTeacher = () => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let teacher = ''
+
+            teacher = await db.User.findAll({
+                attributes: ['id','firstName', 'lastName','Class'],
+                where: {
+                    roleId: 2
+                }
+            })
+
+            resolve(teacher)
+           
+        }catch (e) {
+            reject(e)
+        }
+    })
+    
+}
+
 module.exports = {
     handleUserLogin: handleUserLogin,
     getAllUsers: getAllUsers,
     createNewUser: createNewUser,
     deleteUser:deleteUser,
     updateUserData: updateUserData,
-    getAllStudents: getAllStudents
+    getAllStudents: getAllStudents,
+    updateStudentClass: updateStudentClass,
+    getTeacher: getTeacher,
+
 }

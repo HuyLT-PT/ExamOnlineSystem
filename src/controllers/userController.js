@@ -61,9 +61,12 @@ let handleEditUser = async(req,res) => {
     let message =await userService.updateUserData(data)
     return res.status(200).json(message)
 }
-let handleGetAllStudent = async(req, res) => {
+
+let handleGetAllStudent = async (req, res) => {
+    
     let id = req.query.id // all or id
-   
+    
+    
     if (!id) {
        return res.status(500).json({
         errCode: 1 ,
@@ -78,12 +81,19 @@ let handleGetAllStudent = async(req, res) => {
         errMessage: 'OK',
         users
     })
- }
+}
+let handleEditStudentClass = async (req, res) => {
+    let data =req.body 
+    let message =await userService.updateStudentClass(data)
+    return res.status(200).json(message)
+}
+
 module.exports= {
     hendleLogin: hendleLogin,
     hendleGetAllUsers: hendleGetAllUsers,
     handleCreateNewUser: handleCreateNewUser,
     handleEditUser: handleEditUser,
     handleDeleteUser: handleDeleteUser,
-    handleGetAllStudent : handleGetAllStudent
+    handleGetAllStudent: handleGetAllStudent,
+    handleEditStudentClass: handleEditStudentClass
 }

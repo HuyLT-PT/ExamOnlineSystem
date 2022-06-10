@@ -26,6 +26,8 @@ let initWebRoutes = (app) => {
     router.put('/api/edit-user', userController.handleEditUser);
     router.delete('/api/delete-user', userController.handleDeleteUser);
     router.get('/api/get-student', userController.handleGetAllStudent)
+    router.put('/api/edit-student-class', userController.handleEditStudentClass);
+
     //exam
     router.get('/api/get-exam', examController.handleGetExams)
     router.put('/api/edit-exam', examController.handleEditExam);
@@ -40,7 +42,8 @@ let initWebRoutes = (app) => {
 
 
     // classes
-     router.get('/api/get-class', classController.handleGetClasses)
+    router.get('/api/get-class', classController.handleGetClasses)
+    
     //get data start page
     router.get('/',(req,res)=>{
         return res.send(" Start")
