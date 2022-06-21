@@ -1,6 +1,5 @@
 import db from "../models/index"
 import bcrypt from 'bcryptjs'
-import { reject } from "bcrypt/promises"
 const salt = bcrypt.genSaltSync(10);
 
 let getAllExams = (classId) => {
@@ -116,9 +115,135 @@ let createNewExam = (data) => {
         }
     })
 }
+let checkPoint = (data) => {
+    return new Promise(async(resolve, reject) => {
+
+        try {
+
+            let questions = await db.Questions.findAll({
+                where: {
+                    examId : data.examId
+                }
+            })
+            let check = 1; 
+            if (data.studentAnswer == questions.key) {
+                check = 0;
+               
+            } else {
+                check = 1;
+            }
+            await db.StudentAnswer.create({
+                studentId: data.studentId ,
+                examId: data.examId,
+                subject: data.subject,
+                sbd: data.sbd,
+                questionId: data.questionId,
+                studentAnswer: data.studentAnswer,
+                result : check
+            })
+            resolve({
+                    errCode: 0,
+                    message: 'OK'
+                });
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+let getExamPoint = (examId) => {
+    // std id , exam id 
+    return new Promise(async(resolve, reject) => {
+
+        try {
+           
+             let ans = await db.StudentAnswer.findAll({
+                 where: {
+                     examId: examId,
+                     studentId: 2
+                 },
+                 raw : false
+             })
+            let count = 0;
+            
+            for (let i = 0; i < ans.length; i++){
+                
+                if (ans[i].result == 0) {
+                    count++
+                }
+            }
+            resolve(count)
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+let saveAnswer = (data) => {
+   return new Promise(async(resolve, reject) => {
+
+        try {
+            let questions = await db.Questions.findAll({
+                where: {
+                    id : data.id,
+                    examId : data.examId
+                }
+            })
+            let check = 1; 
+     
+            let ans = questions[0].key
+   
+            if (data.key === ans) {  //data.key is student answer
+                check = 0;
+               
+            } else {
+                check = 1;
+            }
+            let checkans = await db.StudentAnswer.findOne({
+                where: {
+                    questionId: data.id,
+                    studentId: 2,
+                    examId: data.examId
+                },
+                raw:false
+            })
+
+            if (checkans) {
+                checkans.studentAnswer = data.key
+                checkans.result = check
+                await checkans.save()
+                resolve({
+                    errCode: 0,
+                    message: 'ans updated'
+                })
+            } else {
+                
+                await db.StudentAnswer.create({
+                    studentId: 2,
+                    examId: data.examId,
+                    subject: 'English',
+                    sbd: 150001,
+                    questionId: data.id,
+                    studentAnswer: data.key,
+                    result: check
+                })
+                    resolve({
+                    errCode: 0,
+                    message: 'ans created',
+                    check 
+                }); 
+
+            } 
+   
+        } catch (e) {
+            reject(e)
+        }
+    }) 
+}
 module.exports = {
     getAllExams: getAllExams,
     deleteExam: deleteExam,
     updateExamData: updateExamData,
-    createNewExam : createNewExam
+    createNewExam: createNewExam,
+    checkPoint: checkPoint,
+    getExamPoint: getExamPoint,
+    saveAnswer :saveAnswer
 }

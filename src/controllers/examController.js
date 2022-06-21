@@ -40,9 +40,25 @@ let handleCreateNewExam  = async (req, res) => {
     let message = await examService.createNewExam(req.body)
     return res.status(200).json(message)
 }
+let handleGetExamPoint = async (req, res) => {
+    let data = req.query.id
+    
+    let message = await examService.getExamPoint(data)
+    return res.status(200).json(message)
+}
+let handleEditStudentAnswer = async (req, res) => {
+    let data = req.body
+    //console.log(data)
+    let message = await examService.saveAnswer(data)
+    return res.status(200).json(message)
+}
+
 module.exports = {
     handleGetExams: handleGetExams,
     handleDeleteExam: handleDeleteExam,
     handleEditExam: handleEditExam,
-    handleCreateNewExam:handleCreateNewExam
+    handleCreateNewExam: handleCreateNewExam,
+    handleGetExamPoint: handleGetExamPoint,
+    handleEditStudentAnswer: handleEditStudentAnswer,
+
 }
