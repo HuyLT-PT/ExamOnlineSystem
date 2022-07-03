@@ -52,7 +52,12 @@ let handleEditStudentAnswer = async (req, res) => {
     let message = await examService.saveAnswer(data)
     return res.status(200).json(message)
 }
-
+let handleGetAnswer = async (req, res) => {
+    let data = req.query.id
+    //console.log(data)
+    let message = await examService.getAnswer(data)
+    return res.status(200).json(message)
+}
 module.exports = {
     handleGetExams: handleGetExams,
     handleDeleteExam: handleDeleteExam,
@@ -60,5 +65,6 @@ module.exports = {
     handleCreateNewExam: handleCreateNewExam,
     handleGetExamPoint: handleGetExamPoint,
     handleEditStudentAnswer: handleEditStudentAnswer,
+    handleGetAnswer:handleGetAnswer
 
 }

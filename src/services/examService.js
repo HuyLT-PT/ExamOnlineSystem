@@ -73,11 +73,16 @@ let updateExamData = (data) => {
              let exam= await db.Exam.findOne({
                  where: { id: data.id } ,
                  raw : false
-            })
+             })
+           
             if (exam) {
                 exam.time = data.time
                 exam.impClass = data.impClass
-
+                if (data.status === 'NOT DONE') {
+                    exam.status = null
+                } else {
+                    exam.status = 'DONE'
+                }
                 await exam.save()
                 resolve({
                     errCode: 0,
@@ -179,7 +184,7 @@ let getExamPoint = (examId) => {
 }
 let saveAnswer = (data) => {
    return new Promise(async(resolve, reject) => {
-
+ 
         try {
             let questions = await db.Questions.findAll({
                 where: {
@@ -238,6 +243,28 @@ let saveAnswer = (data) => {
         }
     }) 
 }
+let getAnswer = (examId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let ans = '' 
+
+            ans = await db.StudentAnswer.findAll({
+                attributes: ['studentAnswer','questionId'],
+                 where: {
+                     examId: examId,
+                     studentId: 2
+                 },
+                 raw : false
+             })
+            
+
+            resolve(ans)
+           
+        }catch (e) {
+            reject(e)
+        }
+    })
+}
 module.exports = {
     getAllExams: getAllExams,
     deleteExam: deleteExam,
@@ -245,5 +272,6 @@ module.exports = {
     createNewExam: createNewExam,
     checkPoint: checkPoint,
     getExamPoint: getExamPoint,
-    saveAnswer :saveAnswer
+    saveAnswer: saveAnswer,
+    getAnswer :getAnswer
 }
