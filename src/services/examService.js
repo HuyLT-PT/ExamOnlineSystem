@@ -168,6 +168,7 @@ let getExamPoint = (examId) => {
                  },
                  raw : false
              })
+            
             let count = 0;
             
             for (let i = 0; i < ans.length; i++){
@@ -176,6 +177,30 @@ let getExamPoint = (examId) => {
                     count++
                 }
             }
+        //   console.log (ans[0])
+            let arr = []
+            for (let i = 0; i < ans.length; i++){
+                let c = {
+                id: ans[i].questionId,
+                ans: ans[i].studentAnswer
+                }
+                 arr.push(c)
+            }
+
+        
+           
+          //  let test= await db.ExamAnswer.findAll()
+           //   console.log(test)
+              //  console.log(arr)
+             /*  await db.ExamAnswer.create({
+                    examId:  examId,
+                    studentId: 2,
+                    answerList: arr,
+                    note : 'ok'
+                }) */
+            
+        
+
             resolve(count)
         } catch (e) {
             reject(e)
@@ -249,7 +274,7 @@ let getAnswer = (examId) => {
             let ans = '' 
 
             ans = await db.StudentAnswer.findAll({
-                attributes: ['studentAnswer','questionId'],
+                attributes: ['studentAnswer','questionId','studentId','examId'],
                  where: {
                      examId: examId,
                      studentId: 2
@@ -265,6 +290,55 @@ let getAnswer = (examId) => {
         }
     })
 }
+let saveExam = (data) => {
+    return new Promise(async(resolve, reject) => {
+
+        try {     
+         
+            let examId = data[0].examId
+            let studentId = data[0].studentId
+           
+     
+            let arr = []
+            for (let i = 0; i < data.length; i++){
+                let c = {
+                id: data[i].questionId,
+                ans: data[i].studentAnswer
+                }
+                 arr.push(c)
+            }
+ 
+            
+            let test= await db.ExamAns.create({
+               examId: 2,
+               studentId: 2,
+               ansList: arr
+                })  
+            
+            
+            let ans = await db.StudentAnswer.findAll({
+                 where: {
+                     examId: examId,
+                     studentId: studentId
+                 },
+                 raw : false
+             })
+            
+            let count = 0;
+            
+            for (let i = 0; i < ans.length; i++){
+                
+                if (ans[i].result == 0) {
+                    count++
+                }
+            }
+            
+            resolve(count)  
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 module.exports = {
     getAllExams: getAllExams,
     deleteExam: deleteExam,
@@ -273,5 +347,6 @@ module.exports = {
     checkPoint: checkPoint,
     getExamPoint: getExamPoint,
     saveAnswer: saveAnswer,
-    getAnswer :getAnswer
+    getAnswer: getAnswer,
+    saveExam :saveExam
 }
