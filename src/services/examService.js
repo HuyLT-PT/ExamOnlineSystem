@@ -333,8 +333,27 @@ let saveExam = (data) => {
                 }
             }
             
-            resolve(count)  
+            resolve('submit success')  
         } catch (e) {
+            reject(e)
+        }
+    })
+}
+let getAllExamAns = (examId) => {
+     return new Promise(async(resolve, reject) => {
+        try {
+            let exams = ''
+            exams = await db.ExamAns.findOne({
+                    attributes: ['examId','studentId','ansList','note'],
+
+                    where: {
+                        examId : examId 
+                    }
+            })     
+            
+            resolve(exams)
+           
+        }catch (e) {
             reject(e)
         }
     })
@@ -348,5 +367,6 @@ module.exports = {
     getExamPoint: getExamPoint,
     saveAnswer: saveAnswer,
     getAnswer: getAnswer,
-    saveExam :saveExam
+    saveExam: saveExam,
+    getAllExamAns :getAllExamAns
 }

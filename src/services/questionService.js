@@ -10,11 +10,12 @@ let getAllQuestionFromExam = (examId) => {
            
             if (examId === 'ALL') {
                 questions = await db.Questions.findAll({
-                   
+                   attributes: ['id','examId','content','optionA','optionB','optionC','optionD'],
                 })
             }
             if (examId && examId !== 'ALL') {
                 questions = db.Questions.findAll({
+                    attributes: ['id','examId','content','optionA','optionB','optionC','optionD'],
                     where: { examId: examId } ,
                 }) 
             }
@@ -118,8 +119,33 @@ let updateQuestionData = (data) => {
         }
     })
 }
+let getAllQuestionForTeacher = (examId) => {
+    return new Promise(async (resolve, reject) => {
+        
+        try {
+            let questions = ''
+           
+            if (examId === 'ALL') {
+                questions = await db.Questions.findAll({
+                   
+                })
+            }
+            if (examId && examId !== 'ALL') {
+                questions = db.Questions.findAll({
+                    where: { examId: examId } ,
+                }) 
+            }
+
+            resolve(questions)
+           
+        }catch (e) {
+            reject(e)
+        }
+    })
+}
 module.exports = {
     getAllQuestionFromExam: getAllQuestionFromExam,
     createNewQuestion: createNewQuestion,
-    updateQuestionData :updateQuestionData
+    updateQuestionData: updateQuestionData,
+    getAllQuestionForTeacher:getAllQuestionForTeacher
 }
