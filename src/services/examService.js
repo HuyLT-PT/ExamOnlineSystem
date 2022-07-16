@@ -1,5 +1,8 @@
 import db from "../models/index"
 import bcrypt from 'bcryptjs'
+import { encode, decode } from 'node-base64-image';
+import * as Base64_Blob from 'base64-blob'
+var path = require('path');
 const salt = bcrypt.genSaltSync(10);
 
 let getAllExams = (classId) => {
@@ -148,7 +151,8 @@ let checkPoint = (data) => {
             })
             resolve({
                     errCode: 0,
-                    message: 'OK'
+                    message: 'OK',
+                    
                 });
         } catch (e) {
             reject(e)
@@ -294,7 +298,7 @@ let saveExam = (data) => {
     return new Promise(async(resolve, reject) => {
 
         try {     
-         
+            console.log(data)
             let examId = data[0].examId
             let studentId = data[0].studentId
            
@@ -308,14 +312,58 @@ let saveExam = (data) => {
                  arr.push(c)
             }
  
-            
+            // add data to ExamAns
             let test= await db.ExamAns.create({
                examId: 2,
                studentId: 2,
                ansList: arr
                 })  
-            
-            
+               // 0 arr ={'id':questionid,'ans': ans}
+            // add data to student Ans for check point
+            for (let i = 0; i < arr.length; i++){
+    
+                let old = await db.StudentAnswer.findOne({
+                 where: {
+                        examId: examId,
+                        studentId: studentId,
+                        questionId: arr[i].id
+                    },
+                    
+                 raw : false
+                })
+
+                let key = await db.Questions.findAll({
+                where: {
+                    id : arr[i].id,
+                    examId :examId
+                }
+                })
+                 // check-point
+                let check = 1; 
+
+                if (arr[i].ans===key.key) {
+                    check=0
+                } else {
+                    check =1
+                }
+              if (old) {
+                    // update
+                    old.studentAnswer = arr[i].ans
+                    old.result = check
+                    await  old.save()
+                } else {
+                    //create
+                    await db.StudentAnswer.create({
+                        examId: examId,
+                        studentId: studentId,
+                        questionId: arr[i].id,
+                        studentAnswer: arr[i].ans,
+                        result : check
+                    })
+                }
+            }
+           
+            // get-point with student answer
             let ans = await db.StudentAnswer.findAll({
                  where: {
                      examId: examId,
@@ -333,7 +381,7 @@ let saveExam = (data) => {
                 }
             }
             
-            resolve('submit success')  
+            resolve('submit success with point' ,count)  
         } catch (e) {
             reject(e)
         }
@@ -343,7 +391,7 @@ let getAllExamAns = (examId) => {
      return new Promise(async(resolve, reject) => {
         try {
             let exams = ''
-            exams = await db.ExamAns.findOne({
+            exams = await db.ExamAns.findAll({
                     attributes: ['examId','studentId','ansList','note'],
 
                     where: {
@@ -358,6 +406,89 @@ let getAllExamAns = (examId) => {
         }
     })
 }
+let uploadImgForExam = (data) => {
+     return new Promise(async(resolve, reject) => {
+        try {
+            // fake input = data.image
+       /* let url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnG5KPZl_R5gj1nwITIHEOJIrsBfc4_NUEqQ&usqp=CAU';
+            let options = {
+                string: true,
+                headers: {
+                    "User-Agent": "my-app"
+            }
+            }; */
+
+           // let img = await encode(url, options);
+            //console.log(img)
+            let img = data.image
+            await decode(img, { fname: `./src/example/Exam_${data.examId}_Student_${data.studentId}`, ext: 'jpg' });
+
+            let p = path.dirname(`./src/example/Exam_${data.examId}_Student_${data.studentId}.jpg`); 
+            let q = path.basename(`./src/example/Exam_${data.examId}_Student_${data.studentId}.jpg`)
+
+        /*    await db.ExamAns.create({
+                examId: data.examId,
+                studentId: data.studentId,
+                img: img ,
+                note : p+'/'+q
+            })  */
+            // test file
+          /*  let test=  await db.ExamAns.findOne({
+                examId: data.examId,
+                studentId: data.studentId,
+                
+            })
+            console.log(test.note) 
+
+            let r = path.basename(test.note) */
+             //console.log(r)
+           // let blob =  Buffer.from(img);
+            // let blob =  Base64_Blob.base64ToBlob(img)
+           // my.ini -> max_allowed_package
+             
+            // save to storage
+
+            // await decode(img, { fname: '../photo', ext: 'jpg' });
+            
+            // save link to db
+
+            let newAns= await db.ExamAns.findOne({
+                 where: {
+                     
+                     examId: data.examId,
+                     studentId : data.studentId
+                 },
+                 raw : false
+            })
+            if (newAns) {
+                    
+                await newAns.save({
+                    note : p+ '/' +q
+                })
+                resolve({
+                    errCode: 0,
+                    message: 'img updated',
+                    
+                })
+            } else {
+                await db.ExamAns.create({
+                    examId: data.examId,
+                    studentId: data.studentId,
+                    note: p+'/'+q
+                })
+                resolve({
+                    errCode: 0,
+                    errMessage: 'create new ans' ,
+                     
+                })
+            }
+            resolve( 'update Ok')
+           
+        }catch (e) {
+            reject(e)
+        }
+    })   
+}
 module.exports = {
     getAllExams: getAllExams,
     deleteExam: deleteExam,
@@ -368,5 +499,6 @@ module.exports = {
     saveAnswer: saveAnswer,
     getAnswer: getAnswer,
     saveExam: saveExam,
-    getAllExamAns :getAllExamAns
+    getAllExamAns: getAllExamAns,
+    uploadImgForExam:uploadImgForExam
 }

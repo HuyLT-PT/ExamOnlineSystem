@@ -1,18 +1,20 @@
 import db from "../models/index"
 import bcrypt from 'bcryptjs'
 import { reject } from "bcrypt/promises"
+import e from "express";
 const salt = bcrypt.genSaltSync(10);
 
 let handleUserLogin = (email, password) => {
     return new Promise(async(resolve,reject) => {
         try {
-            let userData ={}
+            let userData = {}
+          
             let isExist = await checkUserEmail(email)         
             if (isExist) {
               // User already exist
                 let user = await db.User.findOne(
                     {   
-                        attributes: ['email','roleId','id', 'password'],
+                        attributes: ['email','roleId','id', 'password','class'],
                         where: { email: email },
                         raw : true
                     }
@@ -40,6 +42,7 @@ let handleUserLogin = (email, password) => {
                 // return error
                 userData.errCode = 1
                 userData.errMessage = 'Your email isnt exist'  
+                
             }
             resolve(userData)
         } catch (e) {
@@ -120,7 +123,8 @@ let createNewUser = (data) => {
                     password: hashPasswordFromBcypt,
                     firstName: data.firstName,
                     lastName: data.lastName,
-                    dateOfBirth: null,
+                    dateOfBirth: data.dateOfBirth,
+                    class : data.class,
                     phoneNumber: data.phoneNumber,
                     address: data.address,
                     gender: data.gender === 1 ? true : false,
@@ -181,6 +185,9 @@ let updateUserData = (data) => {
                 user.lastName = data.lastName
                 user.address = data.address
                 user.phoneNumber = data.phoneNumber
+                user.class = data.class
+                user.gender = data.gender
+                user.dateOfBirth =data.dateOfBirth
 
             /*    await db.User.save({
                     firstName : data.firstName,

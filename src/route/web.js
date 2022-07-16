@@ -12,13 +12,15 @@ let initWebRoutes = (app) => {
     //get data
     router.get('/Home',homeController.getHomePage);
     router.get('/about',homeController.getAboutPage);
-    router.get('/Crud',homeController.getCRUD);
-    // test
+    router.get('/Crud', homeController.getCRUD);
+    
+    //test
     router.post('/post-crud',homeController.postCRUD);
     router.get('/get-crud',homeController.displayGetCRUD);
     router.get('/edit-crud',homeController.getEditCRUD);
     router.post('/put-crud',homeController.putCRUD);
     router.get('/delete-crud', homeController.deleteCRUD);
+
     //user
     router.post('/api/login', userController.hendleLogin);
     router.get('/api/get-user', userController.hendleGetAllUsers);
@@ -37,7 +39,8 @@ let initWebRoutes = (app) => {
     router.get('/api/get-answer', examController.handleGetAnswer)
     router.put('/api/edit-student-answer', examController.handleEditStudentAnswer);
     router.put('/api/save-exam', examController.handleSaveExam);
-    router.get('/api/get-exam-ans', examController.handleGetExamAns)
+    router.get('/api/get-exam-ans', examController.handleGetExamAns);
+    router.post('/api/upload-img', examController.handleUploadImg);
  
     
     //question
@@ -53,7 +56,7 @@ let initWebRoutes = (app) => {
     
     //get data start page
     router.get('/',(req,res)=>{
-        return res.send(" Start")
+        return res.send("Start")
     } );
   
 

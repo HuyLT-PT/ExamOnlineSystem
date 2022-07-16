@@ -1,5 +1,5 @@
 import examService from "../services/examService"
-
+import {encode, decode} from 'node-base64-image';
 let handleGetExams =async(req,res) => {
     let id = req.query.id 
 
@@ -60,9 +60,9 @@ let handleGetAnswer = async (req, res) => {
 }
 let handleSaveExam = async (req, res) => {
     let data = req.body 
-   // console.log(data)
-    let message = await examService.saveExam(data)
-    return res.status(200).json(message) // true answer
+    console.log(data)
+    // let message = await examService.saveExam(data)
+    return res.status(200).json('message') // true answer
 }
 let handleGetExamAns = async (req, res) => {
    let id = req.query.id 
@@ -92,6 +92,17 @@ let handleGetExamAns = async (req, res) => {
         })
     }
 }
+let handleUploadImg = async (req, res) => {
+    let input = req.body
+    
+    console.log(input)
+    let data = await examService.uploadImgForExam(input)
+    return res.status(200).json({
+        errCode: 0,
+        errMessage: 'upload img successfully',
+        data
+    })
+}
 module.exports = {
     handleGetExams: handleGetExams,
     handleDeleteExam: handleDeleteExam,
@@ -101,6 +112,7 @@ module.exports = {
     handleEditStudentAnswer: handleEditStudentAnswer,
     handleGetAnswer: handleGetAnswer,
     handleSaveExam: handleSaveExam,
-    handleGetExamAns:handleGetExamAns
+    handleGetExamAns: handleGetExamAns,
+    handleUploadImg:handleUploadImg
 
 }

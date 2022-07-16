@@ -18,6 +18,7 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");;
   next();
 });
+
 //app.use(cors())
  
 /*app.get('/products/:id', function (req, res, next) {
@@ -34,6 +35,7 @@ app.listen(80, function () {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
+
 
 viewEngine(app);
 initWebRoutes(app);
