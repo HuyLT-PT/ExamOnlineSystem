@@ -2,6 +2,8 @@ import db from "../models/index"
 import bcrypt from 'bcryptjs'
 import { encode, decode } from 'node-base64-image';
 import * as Base64_Blob from 'base64-blob'
+import { count } from "console";
+import { create } from "domain";
 var path = require('path');
 const salt = bcrypt.genSaltSync(10);
 
@@ -298,90 +300,88 @@ let saveExam = (data) => {
     return new Promise(async(resolve, reject) => {
 
         try {     
-            console.log(data)
-            let examId = data[0].examId
-            let studentId = data[0].studentId
-           
+          
+            let examId = data.examId
+            let studentId = 2 //data.studentId
+            let studentAns = data.data
      
-            let arr = []
-            for (let i = 0; i < data.length; i++){
-                let c = {
-                id: data[i].questionId,
-                ans: data[i].studentAnswer
+            let arr = []  // id = qId ans = stdans
+            let ansList = []
+            let c = []
+     
+            let count = 0;
+            // get Ans List
+            for (let i = 0; i < studentAns.length; i++) {
+                c = {
+                id: studentAns[i].questionId,
+                ans: studentAns[i].studentAnswer
                 }
-                 arr.push(c)
+                arr.push(c)
+                    let questionInfoFromDb = await db.Questions.findAll({
+                    where: {
+                    id : arr[i].id,
+                    examId :examId
+                    }
+                 })
+                 
+                ansList.push(questionInfoFromDb[0].key)
+               
+                
             }
- 
-            // add data to ExamAns
-            let test= await db.ExamAns.create({
-               examId: 2,
-               studentId: 2,
-               ansList: arr
-                })  
-               // 0 arr ={'id':questionid,'ans': ans}
+           // add data to ExamAns
+         /*   await db.ExamAns.create({
+                examId: examId,
+                studentId: studentId,
+                ansList: arr
+                 })  */
+           
+         
             // add data to student Ans for check point
+           
             for (let i = 0; i < arr.length; i++){
-    
+                
+                // check db 
                 let old = await db.StudentAnswer.findOne({
                  where: {
                         examId: examId,
                         studentId: studentId,
                         questionId: arr[i].id
-                    },
+                   },
                     
-                 raw : false
-                })
-
-                let key = await db.Questions.findAll({
-                where: {
-                    id : arr[i].id,
-                    examId :examId
-                }
-                })
+               
+                raw : false
+                })            
                  // check-point
                 let check = 1; 
 
-                if (arr[i].ans===key.key) {
-                    check=0
-                } else {
-                    check =1
+                if (arr[i].ans===ansList[i]) {
+                    check = 0
+                    count ++
+               } else {
+                   check =1
                 }
-              if (old) {
-                    // update
+                if (old) {
+               
+                // update
                     old.studentAnswer = arr[i].ans
                     old.result = check
                     await  old.save()
                 } else {
                     //create
-                    await db.StudentAnswer.create({
-                        examId: examId,
-                        studentId: studentId,
-                        questionId: arr[i].id,
-                        studentAnswer: arr[i].ans,
-                        result : check
-                    })
-                }
-            }
-           
-            // get-point with student answer
-            let ans = await db.StudentAnswer.findAll({
-                 where: {
-                     examId: examId,
-                     studentId: studentId
-                 },
-                 raw : false
-             })
-            
-            let count = 0;
-            
-            for (let i = 0; i < ans.length; i++){
+                        console.log('create')
+         //           await db.StudentAnswer.create({
+          //              examId: examId,
+          //              studentId: studentId,
+          //              questionId: arr[i].id,
+           //             studentAnswer: arr[i].ans,
+           //             result : check
+          //          })
+        //        }
+                    }
                 
-                if (ans[i].result == 0) {
-                    count++
-                }
             }
-            
-            resolve('submit success with point' ,count)  
+   
+         resolve('submit success with point',count)  
         } catch (e) {
             reject(e)
         }

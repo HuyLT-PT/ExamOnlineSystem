@@ -59,10 +59,10 @@ let handleGetAnswer = async (req, res) => {
     return res.status(200).json(message)
 }
 let handleSaveExam = async (req, res) => {
-    let data = req.body 
-    console.log(data)
-    // let message = await examService.saveExam(data)
-    return res.status(200).json('message') // true answer
+    let data = req.body // mutilpath query multer
+    //console.log(data)
+     let message = await examService.saveExam(data)
+    return res.status(200).json(message) // true answer
 }
 let handleGetExamAns = async (req, res) => {
    let id = req.query.id 
