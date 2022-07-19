@@ -1,9 +1,7 @@
 import db from "../models/index"
-import bcrypt from 'bcryptjs'
+import bcrypt, { compareSync } from 'bcryptjs'
 import { encode, decode } from 'node-base64-image';
 import * as Base64_Blob from 'base64-blob'
-import { count } from "console";
-import { create } from "domain";
 var path = require('path');
 const salt = bcrypt.genSaltSync(10);
 
@@ -406,9 +404,11 @@ let getAllExamAns = (examId) => {
         }
     })
 }
-let uploadImgForExam = (data) => {
+let uploadImgForExam = (examId,studentId,path) => {
      return new Promise(async(resolve, reject) => {
-        try {
+         try {
+             
+            
             // fake input = data.image
        /* let url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnG5KPZl_R5gj1nwITIHEOJIrsBfc4_NUEqQ&usqp=CAU';
             let options = {
@@ -419,19 +419,23 @@ let uploadImgForExam = (data) => {
             }; */
 
            // let img = await encode(url, options);
-            //console.log(img)
-            let img = data.image
-            await decode(img, { fname: `./src/example/Exam_${data.examId}_Student_${data.studentId}`, ext: 'jpg' });
+          
+             
+            /*let img = data
+            const b64 = img.toString('base64');
+                
 
-            let p = path.dirname(`./src/example/Exam_${data.examId}_Student_${data.studentId}.jpg`); 
-            let q = path.basename(`./src/example/Exam_${data.examId}_Student_${data.studentId}.jpg`)
-
-        /*    await db.ExamAns.create({
-                examId: data.examId,
-                studentId: data.studentId,
-                img: img ,
-                note : p+'/'+q
-            })  */
+             await decode(b64, { fname: `./src/example/Exam_${data.examId}_Student_${data.studentId}`, ext: 'jpg' });
+            console.log(b64) */
+         //   let p = path.dirname(`./src/example/Exam_${examId}_Student_${studentId}.jpg`); 
+          //  let q = path.basename(`./src/example/Exam_${examId}_Student_${studentId}.jpg`) 
+            
+            await db.ExamAns.create({
+                examId: examId,
+                studentId: studentId,
+                img: path ,
+        
+            })  
             // test file
           /*  let test=  await db.ExamAns.findOne({
                 examId: data.examId,
@@ -450,40 +454,7 @@ let uploadImgForExam = (data) => {
 
             // await decode(img, { fname: '../photo', ext: 'jpg' });
             
-            // save link to db
-
-            let newAns= await db.ExamAns.findOne({
-                 where: {
-                     
-                     examId: data.examId,
-                     studentId : data.studentId
-                 },
-                 raw : false
-            })
-            if (newAns) {
-                    
-                await newAns.save({
-                    note : p+ '/' +q
-                })
-                resolve({
-                    errCode: 0,
-                    message: 'img updated',
-                    
-                })
-            } else {
-                await db.ExamAns.create({
-                    examId: data.examId,
-                    studentId: data.studentId,
-                    note: p+'/'+q
-                })
-                resolve({
-                    errCode: 0,
-                    errMessage: 'create new ans' ,
-                     
-                })
-            }
-            resolve( 'update Ok')
-           
+            // save link to db    
         }catch (e) {
             reject(e)
         }
