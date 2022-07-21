@@ -66,14 +66,16 @@ let handleGetAllStudent = async (req, res) => {
     
     let id = req.query.id // all or id
     
-    
-    if (!id) {
-       return res.status(500).json({
-        errCode: 1 ,
-        errMessage: 'Missing id',
-        users : []
+    let userId = req.query.userId
+
+    if (userId) {
+       let info = await userService.getStudentWithExam(userId)
+       return res.status(200).json({
+        errCode: 0 ,
+        errMessage: 'get info ok',
+        data : info
     }) 
-    }
+    } else {
     let users = await userService.getAllStudents(id)
 
     return res.status(200).json({
@@ -81,6 +83,8 @@ let handleGetAllStudent = async (req, res) => {
         errMessage: 'OK',
         users
     })
+    }
+    
 }
 let handleEditStudentClass = async (req, res) => {
     let data =req.body 

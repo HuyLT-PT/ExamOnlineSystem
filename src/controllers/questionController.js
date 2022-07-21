@@ -9,7 +9,7 @@ let handleGetQuestions = async (req, res) => {
        return res.status(500).json({
         errCode: 1 ,
         errMessage: 'Missing id',
-        questionsList : []
+        data : []
     }) 
     }   
     
@@ -18,7 +18,7 @@ let handleGetQuestions = async (req, res) => {
         return res.status(200).json({
         errCode: 0 ,
         errMessage: 'get questions successfully',
-        questionsList 
+        data : questionsList 
     })
 }
 let handleCreateNewQuestion  = async (req, res) => {
@@ -39,7 +39,7 @@ let handleEditQuestion = async(req, res) => {
        return res.status(500).json({
         errCode: 1 ,
         errMessage: 'Missing id',
-        questionsList : []
+        data : []
     }) 
     }   
     
@@ -48,7 +48,7 @@ let handleEditQuestion = async(req, res) => {
         return res.status(200).json({
         errCode: 0 ,
         errMessage: 'get questions successfully',
-        questionsList 
+        data : questionsList 
     })
 }
 module.exports = {

@@ -299,7 +299,7 @@ let saveExam = (data) => {
 
         try {     
           
-            let examId = data.examId
+            let examId = 2 //data.examId
             let studentId = 2 //data.studentId
             let studentAns = data.data
      
@@ -311,28 +311,26 @@ let saveExam = (data) => {
             // get Ans List
             for (let i = 0; i < studentAns.length; i++) {
                 c = {
-                id: studentAns[i].questionId,
-                ans: studentAns[i].studentAnswer
+                    questionId: studentAns[i].questionId,
+                    studentAnswer: studentAns[i].studentAnswer,
+                    key : ''
                 }
                 arr.push(c)
-                    let questionInfoFromDb = await db.Questions.findAll({
+                let questionInfoFromDb = await db.Questions.findAll({
                     where: {
-                    id : arr[i].id,
+                    id : arr[i].questionId,
                     examId :examId
-                    }
+                        }
+                        
                  })
-                 
+                arr[i].key = questionInfoFromDb[0].key
                 ansList.push(questionInfoFromDb[0].key)
-               
-                
+             
+         
             }
+       
            // add data to ExamAns
-         /*   await db.ExamAns.create({
-                examId: examId,
-                studentId: studentId,
-                ansList: arr
-                 })  */
-           
+              
          
             // add data to student Ans for check point
            
@@ -343,7 +341,7 @@ let saveExam = (data) => {
                  where: {
                         examId: examId,
                         studentId: studentId,
-                        questionId: arr[i].id
+                        questionId: arr[i].questionId
                    },
                     
                
@@ -352,7 +350,7 @@ let saveExam = (data) => {
                  // check-point
                 let check = 1; 
 
-                if (arr[i].ans===ansList[i]) {
+                if (arr[i].studentAnswer===ansList[i]) {
                     check = 0
                     count ++
                } else {
@@ -361,13 +359,14 @@ let saveExam = (data) => {
                 if (old) {
                
                 // update
-                    old.studentAnswer = arr[i].ans
+                    old.studentAnswer = arr[i].studentAnswer
                     old.result = check
+         
                     await  old.save()
                 } else {
                     //create
                         console.log('create')
-         //           await db.StudentAnswer.create({
+         //         await db.StudentAnswer.create({
           //              examId: examId,
           //              studentId: studentId,
           //              questionId: arr[i].id,
@@ -378,25 +377,45 @@ let saveExam = (data) => {
                     }
                 
             }
+             await db.ExamAns.create({
+                examId: examId,
+                studentId: studentId,
+                 ansList: arr,
+                 result : count + '/' + arr.length
+                
+                 })  
+           
    
-         resolve('submit success with point',count)  
+         resolve('submit success with point')  
         } catch (e) {
             reject(e)
         }
     })
 }
-let getAllExamAns = (examId) => {
+let getAllExamAns = (studentId, examId) => {
      return new Promise(async(resolve, reject) => {
         try {
             let exams = ''
             exams = await db.ExamAns.findAll({
-                    attributes: ['examId','studentId','ansList','note'],
+                    attributes: ['examId','studentId','ansList','result'],
 
                     where: {
-                        examId : examId 
+                        examId: examId,
+                        studentId: studentId
+                        
                     }
-            })     
+            }) 
             
+            let examInfo = await db.Exam.findOne({
+                where: {
+                   id : examId
+               }
+            }) 
+            exams[0].name = examInfo.name
+            exams[0].time = examInfo.time
+            exams[0].subject = examInfo.subject
+
+            console.log(exams[0])
             resolve(exams)
            
         }catch (e) {
@@ -460,6 +479,29 @@ let uploadImgForExam = (examId,studentId,path) => {
         }
     })   
 }
+let getExamForUser = (userId, status) => {
+     return new Promise(async(resolve, reject) => {
+        try {
+            let exams = ''
+            let user = await db.User.findOne({
+                where: {
+                    id : userId
+                }
+            })
+          
+            exams = await db.Exam.findAll({
+                where: {
+                    impClass: user.class,
+                    status : status
+                 }
+             })
+            resolve(exams)
+           
+        }catch (e) {
+            reject(e)
+        }
+    })
+}
 module.exports = {
     getAllExams: getAllExams,
     deleteExam: deleteExam,
@@ -471,5 +513,6 @@ module.exports = {
     getAnswer: getAnswer,
     saveExam: saveExam,
     getAllExamAns: getAllExamAns,
-    uploadImgForExam:uploadImgForExam
+    uploadImgForExam: uploadImgForExam,
+    getExamForUser:getExamForUser
 }

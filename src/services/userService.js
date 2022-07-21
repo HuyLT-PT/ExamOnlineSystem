@@ -14,7 +14,7 @@ let handleUserLogin = (email, password) => {
               // User already exist
                 let user = await db.User.findOne(
                     {   
-                        attributes: ['email','roleId','id', 'password','class'],
+                        attributes: ['email','roleId','id', 'password','class','firstName','lastName'],
                         where: { email: email },
                         raw : true
                     }
@@ -303,7 +303,89 @@ let getTeacher = () => {
     })
     
 }
+let getStudentWithExam = (userId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+      
+            let user = await db.User.findOne({
+                where: {
+                     id : userId
+                }
+      
+            })
+            
+            let exams = await db.Exam.findAll({
+                where: {
+                    impClass: '12A1'
+                }
+            })
+            let ans = []
+             ans = await db.ExamAns.findAll({
+                where: {
+                     studentId: userId,
+                }
+                      
+             }) 
+            let resultExam = []
+            let com = new Set()
+            let list = []
+            
+            for (let i = 0; i < ans.length; i++){
+                com.add(ans[i].examId)
+                let c = {}
+                c.examId = ans[i].examId
+                c.result = ans[i].result
+                resultExam.push(c)
+            }
+            for (let i = 0; i < exams.length; i++) {
+                list.push(exams[i].id)
+            }
+            let arr = [... com] 
+            let arr2 =[]
+            for (let i = 0; i < list.length; i++) {
+                if (list[i] !== arr[i]) {
+                    arr2.push(list[i])
+                }
+            }
+            let unCompleted= []
+            for (let i = 0; i < arr2.length; i++) {
+                
 
+                let e = await db.Exam.findOne({
+                    where: {
+                        id : arr2[i]
+                    }
+                })
+                unCompleted.push(e)
+            }
+
+            let r = []
+            for (let i = 0; i < resultExam.length ; i++) {
+                
+                let c = {}
+                c.Examid = resultExam[i].examId
+                c.true = parseInt(resultExam[i].result)
+                c.all = resultExam[i].result.slice(-2)
+               
+                r.push(c)
+            }
+          
+            
+          
+     
+            let data = {}
+            data.allExam = exams.length
+            data.completed = com.size
+            data.unCompleted = unCompleted
+            data.resultExam =  r
+            resolve(data)
+           
+        }catch (e) {
+            reject(e)
+        }
+    })
+    
+}
 module.exports = {
     handleUserLogin: handleUserLogin,
     getAllUsers: getAllUsers,
@@ -313,5 +395,5 @@ module.exports = {
     getAllStudents: getAllStudents,
     updateStudentClass: updateStudentClass,
     getTeacher: getTeacher,
-
+    getStudentWithExam:getStudentWithExam
 }

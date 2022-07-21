@@ -17,7 +17,11 @@ module.exports = {
       ansList: {
         type: Sequelize.JSON,
       },
-      note: {
+      img: {
+        type: Sequelize.STRING
+      },
+
+      result: {
         type: Sequelize.STRING
       },
       createdAt: {

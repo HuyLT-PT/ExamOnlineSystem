@@ -8,23 +8,27 @@ const fs = require('fs');
 var multiparty = require('multiparty');
 let handleGetExams =async(req,res) => {
     let id = req.query.id 
-
- 
-   if (!id) {
-       return res.status(500).json({
-        errCode: 1 ,
-        errMessage: 'Missing id',
-        exams : []
-    }) 
-    }   
+    let userId = req.query.userId
+    let status = req.query.status
+    if (status!="DONE") {status = null}
+    if (userId) {
+       
+        let data = await examService.getExamForUser(userId, status)
+        return res.status(200).json({
+            errCode: 0,
+            errMessage: 'get exam for student ok',
+            data
+        })
+    } else {
     
-    let exams = await examService.getAllExams(id)
+        let exams = await examService.getAllExams(id)
 
         return res.status(200).json({
-        errCode: 0 ,
-        errMessage: 'get Exam successfully',
-        exams
-    })
+            errCode: 0,
+            errMessage: 'get Exam successfully',
+            data: exams
+        })
+    }
 }
 
 let handleDeleteExam = async(req, res) => {
@@ -66,23 +70,18 @@ let handleGetAnswer = async (req, res) => {
 }
 let handleSaveExam = async (req, res) => {
     let data = req.body // 
-    //console.log(data)
-     let message = await examService.saveExam(data)
-    return res.status(200).json(message) // true answer
+    console.log(data)
+    let message = await examService.saveExam(data)
+
+    return res.status(200).json(message) 
 }
 let handleGetExamAns = async (req, res) => {
-   let id = req.query.id 
-
+    let studentId = req.query.studentId
+    let  examId = req.query.examId
  
-   if (!id) {
-       return res.status(500).json({
-        errCode: 1 ,
-        errMessage: 'Missing id',
-        data : []
-    }) 
-    }   
+  
     
-    let data = await examService.getAllExamAns(id)
+    let data = await examService.getAllExamAns(studentId,examId)
     if (data === null) {
         return res.status(200).json({
             errCode: 1,
@@ -100,23 +99,32 @@ let handleGetExamAns = async (req, res) => {
 }
 let handleUploadImg = async (req, res) => {
     let form = new multiparty.Form();
-      
+    let studentId = req.query.studentId
+    let examId = req.query.examId
+  
     form.parse(req ,function (err, fields, files) {  
         if(err){ 
                 throw err; 
         } else {
-            let studentId = fields.studentId[0]
-            let examId = fields.examId[0]
+          //  let studentId = fields.studentId[0]
+          //  let examId = fields.examId[0]
+            
             let oldpath = files.image[0].path
+            console.log('dcu may  la ok ngay di')
             let newPath =`D:/NodeJs/src/public/student${studentId}_examId${examId}.jpg`
             fs.rename(oldpath, newPath, () => { })
+                db.ExamAns.create({
+                    examId: examId,
+                    studentId: studentId,
+                    img: newPath ,
             
-           
-            examService.uploadImgForExam(examId, studentId, newPath)
+                })  
+            
+           // examService.uploadImgForExam(examId, studentId, newPath)
      
-          //examService.uploadImgForExam(examId,studentId,newPath)
+            
             return res.status(200).json({
-                errCode: 0,
+                errCode: 200,
                 errMessage: 'upload img successfully',
 
             })
